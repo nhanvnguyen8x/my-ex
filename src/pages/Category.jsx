@@ -4,7 +4,7 @@ import { selectFilteredReviews } from '../store/reviewsSlice'
 import { setFilterCategory } from '../store/reviewsSlice'
 import { useEffect } from 'react'
 import ReviewCard from '../components/ReviewCard'
-import './Category.css'
+import '../styles/pages/Category.css'
 
 function Category() {
   const { slug } = useParams()

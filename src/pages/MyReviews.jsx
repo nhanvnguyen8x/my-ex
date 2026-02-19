@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { selectFilteredReviews, setFilterCategory, setSortBy } from '../store/reviewsSlice'
 import { Link } from 'react-router-dom'
 import ReviewCard from '../components/ReviewCard'
-import './MyReviews.css'
+import '../styles/pages/MyReviews.css'
 
 function MyReviews() {
   const dispatch = useDispatch()

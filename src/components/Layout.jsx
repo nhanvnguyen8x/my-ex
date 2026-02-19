@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import './Layout.css'
+import '../styles/components/Layout.css'
 
 export default function Layout({ children }) {
   const location = useLocation()

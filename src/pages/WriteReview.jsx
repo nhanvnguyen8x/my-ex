@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addReview } from '../store/reviewsSlice'
-import './WriteReview.css'
+import { createReviewAsync } from '../store/reviewsSlice'
+import '../styles/pages/WriteReview.css'
 
 function WriteReview() {
   const { categorySlug } = useParams()
@@ -18,26 +18,26 @@ function WriteReview() {
   const [rating, setRating] = useState(5)
   const [body, setBody] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const error = useSelector((s) => s.reviews.error)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!title.trim() || !body.trim()) return
-    dispatch(
-      addReview({
-        title: title.trim(),
-        categoryId: categoryId || undefined,
-        rating: rating || undefined,
-        body: body.trim(),
-      })
-    )
+    const payload = {
+      title: title.trim(),
+      categoryId: categoryId || undefined,
+      rating: rating || undefined,
+      body: body.trim(),
+    }
     setSubmitted(true)
-    setTitle('')
-    setBody('')
-    setRating(5)
-    setTimeout(() => {
-      setSubmitted(false)
+    const result = await dispatch(createReviewAsync(payload))
+    if (createReviewAsync.fulfilled.match(result)) {
+      setTitle('')
+      setBody('')
+      setRating(5)
       navigate('/reviews')
-    }, 1500)
+    }
+    setSubmitted(false)
   }
 
   return (
@@ -102,9 +102,10 @@ function WriteReview() {
           required
         />
 
+        {error && <p className="form-error">{error}</p>}
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={submitted}>
-            {submitted ? 'Published!' : 'Publish review'}
+            {submitted ? 'Publishing…' : 'Publish review'}
           </button>
           <button
             type="button"

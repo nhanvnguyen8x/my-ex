@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import * as reviewsApi from '../api/reviews'
 
 const loadReviews = () => {
   try {
@@ -16,8 +17,52 @@ const saveReviews = (reviews) => {
 const initialState = {
   items: loadReviews(),
   filterCategory: null,
-  sortBy: 'newest', // newest | oldest | rating_high | rating_low
+  sortBy: 'newest',
+  loading: false,
+  error: null,
 }
+
+export const fetchReviews = createAsyncThunk(
+  'reviews/fetchReviews',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await reviewsApi.getReviews()
+      if (data != null) return data
+      return loadReviews()
+    } catch (err) {
+      return rejectWithValue(err.response?.data ?? err.message)
+    }
+  }
+)
+
+export const createReviewAsync = createAsyncThunk(
+  'reviews/createReviewAsync',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const created = await reviewsApi.createReview(payload)
+      if (created != null) return created
+      return {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        ...payload,
+      }
+    } catch (err) {
+      return rejectWithValue(err.response?.data ?? err.message)
+    }
+  }
+)
+
+export const deleteReviewAsync = createAsyncThunk(
+  'reviews/deleteReviewAsync',
+  async (id, { rejectWithValue }) => {
+    try {
+      await reviewsApi.deleteReviewById(id)
+    } catch (err) {
+      return rejectWithValue(err.response?.data ?? err.message)
+    }
+    return id
+  }
+)
 
 const reviewsSlice = createSlice({
   name: 'reviews',
@@ -42,10 +87,47 @@ const reviewsSlice = createSlice({
     setSortBy: (state, action) => {
       state.sortBy = action.payload
     },
+    clearError: (state) => {
+      state.error = null
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchReviews.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchReviews.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload?.length >= 0) state.items = action.payload
+      })
+      .addCase(fetchReviews.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload ?? 'Failed to load reviews'
+      })
+      .addCase(createReviewAsync.fulfilled, (state, action) => {
+        if (action.payload && !state.items.some((r) => r.id === action.payload.id)) {
+          state.items.unshift(action.payload)
+          saveReviews(state.items)
+        }
+      })
+      .addCase(createReviewAsync.rejected, (state, action) => {
+        state.error = action.payload ?? 'Failed to create review'
+      })
+      .addCase(deleteReviewAsync.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.items = state.items.filter((r) => r.id !== action.payload)
+          saveReviews(state.items)
+        }
+      })
+      .addCase(deleteReviewAsync.rejected, (state, action) => {
+        state.error = action.payload ?? 'Failed to delete review'
+      })
   },
 })
 
-export const { addReview, deleteReview, setFilterCategory, setSortBy } = reviewsSlice.actions
+export const { addReview, deleteReview, setFilterCategory, setSortBy, clearError } =
+  reviewsSlice.actions
 
 export const selectFilteredReviews = (state) => {
   const { items, filterCategory, sortBy } = state.reviews

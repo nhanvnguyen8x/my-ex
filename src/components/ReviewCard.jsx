@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { deleteReview } from '../store/reviewsSlice'
-import './ReviewCard.css'
+import { deleteReviewAsync } from '../store/reviewsSlice'
+import '../styles/components/ReviewCard.css'
 
 function ReviewCard({ review, showCategory = false }) {
   const dispatch = useDispatch()
@@ -10,7 +10,7 @@ function ReviewCard({ review, showCategory = false }) {
 
   const handleDelete = (e) => {
     e.preventDefault()
-    if (window.confirm('Delete this review?')) dispatch(deleteReview(review.id))
+    if (window.confirm('Delete this review?')) dispatch(deleteReviewAsync(review.id))
   }
 
   const stars = Array.from({ length: 5 }, (_, i) => (

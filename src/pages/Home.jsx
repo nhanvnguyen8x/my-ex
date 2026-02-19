@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectFilteredReviews } from '../store/reviewsSlice'
 import ReviewCard from '../components/ReviewCard'
-import './Home.css'
+import '../styles/pages/Home.css'
 
 function Home() {
   const categories = useSelector((s) => s.categories.list)
