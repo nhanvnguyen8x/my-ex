@@ -1,0 +1,48 @@
+.category-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.category-hero {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.category-hero-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.category-hero-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.category-hero-desc {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.category-page .reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-page .empty-state {
+  text-align: center;
+  padding: 2.5rem;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.category-page .empty-state p {
+  margin-bottom: 1rem;
+}

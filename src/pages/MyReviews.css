@@ -1,0 +1,60 @@
+.my-reviews-page .page-title {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+
+.my-reviews-page .page-subtitle {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.filter-select {
+  min-width: 160px;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.my-reviews-page .reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.my-reviews-page .empty-state {
+  text-align: center;
+  padding: 2.5rem;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.my-reviews-page .empty-state p {
+  margin-bottom: 1rem;
+}
