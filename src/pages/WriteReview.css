@@ -80,7 +80,7 @@
 .rating-star.filled {
   color: var(--accent);
   border-color: var(--accent);
-  background: rgba(232, 184, 109, 0.1);
+  background: rgba(184, 134, 11, 0.12);
 }
 
 .rating-star:hover {
