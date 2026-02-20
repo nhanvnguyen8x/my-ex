@@ -1,23 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import * as reviewsApi from '../api/reviews'
 
-const loadReviews = () => {
-  try {
-    const saved = localStorage.getItem('experience-reviews')
-    return saved ? JSON.parse(saved) : []
-  } catch {
-    return []
-  }
-}
-
-const saveReviews = (reviews) => {
-  localStorage.setItem('experience-reviews', JSON.stringify(reviews))
-}
-
 const initialState = {
-  items: loadReviews(),
+  items: [],
+  currentReview: null,
   filterCategory: null,
   filterSubcategoryId: null,
+  filterProductId: null,
+  filterYear: null,
   sortBy: 'newest',
   loading: false,
   error: null,
@@ -28,8 +18,7 @@ export const fetchReviews = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await reviewsApi.getReviews()
-      if (data != null) return data
-      return loadReviews()
+      return data ?? []
     } catch (err) {
       return rejectWithValue(err.response?.data ?? err.message)
     }
@@ -42,11 +31,20 @@ export const createReviewAsync = createAsyncThunk(
     try {
       const created = await reviewsApi.createReview(payload)
       if (created != null) return created
-      return {
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-        ...payload,
-      }
+      return rejectWithValue('Failed to create review')
+    } catch (err) {
+      return rejectWithValue(err.response?.data ?? err.message)
+    }
+  }
+)
+
+export const fetchReviewById = createAsyncThunk(
+  'reviews/fetchReviewById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await reviewsApi.getReviewById(id)
+      if (data != null) return data
+      return rejectWithValue('Review not found')
     } catch (err) {
       return rejectWithValue(err.response?.data ?? err.message)
     }
@@ -58,10 +56,10 @@ export const deleteReviewAsync = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await reviewsApi.deleteReviewById(id)
+      return id
     } catch (err) {
       return rejectWithValue(err.response?.data ?? err.message)
     }
-    return id
   }
 )
 
@@ -76,24 +74,34 @@ const reviewsSlice = createSlice({
         ...action.payload,
       }
       state.items.unshift(review)
-      saveReviews(state.items)
     },
     deleteReview: (state, action) => {
       state.items = state.items.filter((r) => r.id !== action.payload)
-      saveReviews(state.items)
     },
     setFilterCategory: (state, action) => {
       state.filterCategory = action.payload
       state.filterSubcategoryId = null
+      state.filterProductId = null
+      state.filterYear = null
     },
     setFilterSubcategory: (state, action) => {
       state.filterSubcategoryId = action.payload
+      state.filterProductId = null
+    },
+    setFilterProduct: (state, action) => {
+      state.filterProductId = action.payload
+    },
+    setFilterYear: (state, action) => {
+      state.filterYear = action.payload
     },
     setSortBy: (state, action) => {
       state.sortBy = action.payload
     },
     clearError: (state) => {
       state.error = null
+    },
+    clearCurrentReview: (state) => {
+      state.currentReview = null
     },
   },
   extraReducers: (builder) => {
@@ -113,7 +121,6 @@ const reviewsSlice = createSlice({
       .addCase(createReviewAsync.fulfilled, (state, action) => {
         if (action.payload && !state.items.some((r) => r.id === action.payload.id)) {
           state.items.unshift(action.payload)
-          saveReviews(state.items)
         }
       })
       .addCase(createReviewAsync.rejected, (state, action) => {
@@ -122,25 +129,39 @@ const reviewsSlice = createSlice({
       .addCase(deleteReviewAsync.fulfilled, (state, action) => {
         if (action.payload) {
           state.items = state.items.filter((r) => r.id !== action.payload)
-          saveReviews(state.items)
         }
       })
       .addCase(deleteReviewAsync.rejected, (state, action) => {
         state.error = action.payload ?? 'Failed to delete review'
       })
+      .addCase(fetchReviewById.fulfilled, (state, action) => {
+        state.currentReview = action.payload
+      })
+      .addCase(fetchReviewById.rejected, (state, action) => {
+        state.currentReview = null
+        state.error = action.payload ?? 'Failed to load review'
+      })
   },
 })
 
-export const { addReview, deleteReview, setFilterCategory, setFilterSubcategory, setSortBy, clearError } =
+export const { addReview, deleteReview, setFilterCategory, setFilterSubcategory, setFilterProduct, setFilterYear, setSortBy, clearError, clearCurrentReview } =
   reviewsSlice.actions
 
+export const selectCurrentReview = (state) => state.reviews.currentReview
+
 export const selectFilteredReviews = (state) => {
-  const { items, filterCategory, filterSubcategoryId, sortBy } = state.reviews
+  const { items, filterCategory, filterSubcategoryId, filterProductId, filterYear, sortBy } = state.reviews
   let list = filterCategory
     ? items.filter((r) => r.categoryId === filterCategory)
     : [...items]
   if (filterSubcategoryId) {
     list = list.filter((r) => r.subcategoryId === filterSubcategoryId)
+  }
+  if (filterProductId) {
+    list = list.filter((r) => r.productId === filterProductId)
+  }
+  if (filterYear != null) {
+    list = list.filter((r) => r.year === filterYear)
   }
 
   const compare = (a, b) => {

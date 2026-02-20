@@ -7,11 +7,12 @@ A React + Redux web app for writing and browsing reviews across categories like 
 - **Browse by category** — Cars, Laptops, Phones, Travel, Restaurants, Electronics
 - **Write reviews** — Title, category, 1–5 star rating, and full review text
 - **My Reviews** — View all your reviews with filter by category and sort (newest, oldest, rating)
-- **API or local** — When `VITE_API_URL` is set, reviews are loaded/saved via API; otherwise they use `localStorage`
+- **API-only** — Reviews and auth use the backend; set `VITE_API_URL` to your API base URL (no localStorage)
 
 ## Tech Stack
 
 - **React 18** + **Vite**
+- **Material UI (MUI)** — components, theming, layout
 - **Redux Toolkit** — state (reviews, categories, filters/sort)
 - **React Router** — navigation
 - **Axios** — HTTP client for API calls
@@ -50,11 +51,9 @@ Expected endpoints:
 ```
 src/
   api/          axios client (client.js), reviews API (reviews.js)
-  components/   Layout.jsx, ReviewCard.jsx  (JSX only)
-  pages/        Home.jsx, Category.jsx, WriteReview.jsx, MyReviews.jsx  (JSX only)
-  styles/
-    components/ Layout.css, ReviewCard.css
-    pages/      Home.css, Category.css, WriteReview.css, MyReviews.css
+  components/   Layout.jsx, ReviewCard.jsx  (MUI-based)
+  pages/        Home.jsx, Category.jsx, WriteReview.jsx, MyReviews.jsx
   store/        Redux store, reviewsSlice, categoriesSlice
-  main.jsx, App.jsx, index.css  (global styles)
+  main.jsx      ThemeProvider, CssBaseline, theme, App
+  index.css     minimal global overrides
 ```

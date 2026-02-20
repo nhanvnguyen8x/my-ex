@@ -7,6 +7,8 @@ import Home from './pages/Home'
 import Category from './pages/Category'
 import WriteReview from './pages/WriteReview'
 import MyReviews from './pages/MyReviews'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
 
 function App() {
   const dispatch = useDispatch()
@@ -22,6 +24,8 @@ function App() {
         <Route path="/write" element={<WriteReview />} />
         <Route path="/write/:categorySlug" element={<WriteReview />} />
         <Route path="/reviews" element={<MyReviews />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
       </Routes>
     </Layout>
   )

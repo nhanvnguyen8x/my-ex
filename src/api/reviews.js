@@ -1,31 +1,41 @@
-import { apiClient, hasApi } from './client'
+import { apiClient } from './client'
 
 /**
- * Fetch all reviews from the API.
- * Expected response: { data: Review[] } or Review[]
+ * Get all reviews.
+ * GET /reviews
+ * Returns: Review[] or { data: Review[] }
  */
 export async function getReviews() {
-  if (!hasApi()) return null
   const { data } = await apiClient.get('/reviews')
   return Array.isArray(data) ? data : data?.data ?? []
 }
 
 /**
- * Create a new review.
- * Body: { title, categoryId?, rating?, body }
- * Expected response: created Review object
+ * Get a single review by id.
+ * GET /reviews/:id
+ * Returns: Review
+ */
+export async function getReviewById(id) {
+  const { data } = await apiClient.get(`/reviews/${id}`)
+  return data?.data ?? data
+}
+
+/**
+ * Publish (create) a new review.
+ * POST /reviews
+ * Body: { title, categoryId?, subcategoryId?, productId?, year?, rating?, body }
+ * Returns: created Review
  */
 export async function createReview(payload) {
-  if (!hasApi()) return null
   const { data } = await apiClient.post('/reviews', payload)
-  return data
+  return data?.data ?? data
 }
 
 /**
  * Delete a review by id.
+ * DELETE /reviews/:id
  */
 export async function deleteReviewById(id) {
-  if (!hasApi()) return null
   await apiClient.delete(`/reviews/${id}`)
   return id
 }

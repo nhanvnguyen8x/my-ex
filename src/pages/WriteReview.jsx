@@ -1,11 +1,23 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Rating,
+  FormHelperText,
+  Stack,
+} from '@mui/material'
 import { createReviewAsync } from '../store/reviewsSlice'
-import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
-import '../styles/pages/WriteReview.css'
+import { selectSubcategoriesByCategoryId, selectProductsBySubcategoryId, CATEGORY_IDS_WITHOUT_YEAR } from '../store/categoriesSlice'
 
-function WriteReview() {
+export default function WriteReview() {
   const { categorySlug } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -17,17 +29,29 @@ function WriteReview() {
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState(defaultCategory?.id || categories[0]?.id || '')
   const [subcategoryId, setSubcategoryId] = useState('')
+  const [productId, setProductId] = useState('')
+  const [year, setYear] = useState('')
   const [rating, setRating] = useState(5)
   const [body, setBody] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const error = useSelector((s) => s.reviews.error)
 
   const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, categoryId))
+  const products = useSelector((s) => selectProductsBySubcategoryId(s, subcategoryId))
   const hasSubcategories = subcategories.length > 0
+  const hasProducts = products.length > 0
+  const showYear = !CATEGORY_IDS_WITHOUT_YEAR.includes(categoryId)
+  const subcategoryLabel = categoryId === 'company' ? 'Country' : 'Subcategory'
 
   const handleCategoryChange = (newCategoryId) => {
     setCategoryId(newCategoryId)
     setSubcategoryId('')
+    setProductId('')
+  }
+
+  const handleSubcategoryChange = (newSubcategoryId) => {
+    setSubcategoryId(newSubcategoryId)
+    setProductId('')
   }
 
   const handleSubmit = async (e) => {
@@ -37,6 +61,8 @@ function WriteReview() {
       title: title.trim(),
       categoryId: categoryId || undefined,
       subcategoryId: hasSubcategories && subcategoryId ? subcategoryId : undefined,
+      productId: hasProducts && productId ? productId : undefined,
+      year: showYear && year ? parseInt(year, 10) : undefined,
       rating: rating || undefined,
       body: body.trim(),
     }
@@ -47,109 +73,146 @@ function WriteReview() {
       setBody('')
       setRating(5)
       setSubcategoryId('')
+      setProductId('')
+      setYear('')
       navigate('/reviews')
     }
     setSubmitted(false)
   }
 
   return (
-    <div className="write-review-page">
-      <h1 className="page-title">Write a review</h1>
-      <p className="page-subtitle">Share your experience with others.</p>
+    <Box sx={{ maxWidth: 560, mx: 'auto' }}>
+      <Typography variant="h4" component="h1" sx={{ fontStyle: 'italic' }} gutterBottom>
+        Write a review
+      </Typography>
+      <Typography color="text.secondary" sx={{ mb: 3 }}>
+        Share your experience with others.
+      </Typography>
 
-      <form className="review-form" onSubmit={handleSubmit}>
-        <label className="form-label">
-          Category
-        </label>
-        <select
-          className="form-select"
-          value={categoryId}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-        >
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.icon} {cat.name}
-            </option>
-          ))}
-        </select>
-
-        {hasSubcategories && (
-          <>
-            <label className="form-label">
-              Subcategory
-            </label>
-            <select
-              className="form-select"
-              value={subcategoryId}
-              onChange={(e) => setSubcategoryId(e.target.value)}
+      <Box component="form" onSubmit={handleSubmit}>
+        <Stack spacing={2.5}>
+          <FormControl fullWidth>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={categoryId}
+              label="Category"
+              onChange={(e) => handleCategoryChange(e.target.value)}
             >
-              <option value="">Select (optional)</option>
-              {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.name}
+                </MenuItem>
               ))}
-            </select>
-          </>
-        )}
+            </Select>
+          </FormControl>
 
-        <label className="form-label">
-          Title
-        </label>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="e.g. 2024 Toyota Camry — great daily driver"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+          {hasSubcategories && (
+            <FormControl fullWidth>
+              <InputLabel>{subcategoryLabel}</InputLabel>
+              <Select
+                value={subcategoryId}
+                label={subcategoryLabel}
+                onChange={(e) => handleSubcategoryChange(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select (optional)</em>
+                </MenuItem>
+                {subcategories.map((sub) => (
+                  <MenuItem key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-        <label className="form-label">
-          Rating (1–5)
-        </label>
-        <div className="rating-input">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              type="button"
-              className={`rating-star ${n <= rating ? 'filled' : ''}`}
-              onClick={() => setRating(n)}
-              aria-label={`Rate ${n} stars`}
-            >
-              ★
-            </button>
-          ))}
-        </div>
+          {hasProducts && (
+            <FormControl fullWidth>
+              <InputLabel>Product</InputLabel>
+              <Select
+                value={productId}
+                label="Product"
+                onChange={(e) => setProductId(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select (optional)</em>
+                </MenuItem>
+                {products.map((prod) => (
+                  <MenuItem key={prod.id} value={prod.id}>
+                    {prod.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
 
-        <label className="form-label">
-          Your review
-        </label>
-        <textarea
-          className="form-textarea"
-          placeholder="Describe your experience: pros, cons, would you recommend?"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={6}
-          required
-        />
+          {showYear && (
+            <FormControl fullWidth>
+              <InputLabel>Year</InputLabel>
+              <Select
+                value={year}
+                label="Year"
+                onChange={(e) => setYear(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select (optional)</em>
+                </MenuItem>
+                {Array.from({ length: (new Date().getFullYear() + 2) - 2015 }, (_, i) => 2015 + i)
+                  .reverse()
+                  .map((y) => (
+                    <MenuItem key={y} value={String(y)}>
+                      {y}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          )}
 
-        {error && <p className="form-error">{error}</p>}
-        <div className="form-actions">
-          <button type="submit" className="btn btn-primary" disabled={submitted}>
-            {submitted ? 'Publishing…' : 'Publish review'}
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
+          <TextField
+            label="Title"
+            placeholder={categoryId === 'company' ? 'e.g. Google Vietnam — work culture' : 'e.g. 2024 Toyota Camry — great daily driver'}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            fullWidth
+          />
+
+          <Box>
+            <Typography component="legend" variant="body2" sx={{ mb: 0.5 }}>
+              Rating (1–5)
+            </Typography>
+            <Rating
+              value={rating}
+              onChange={(_, v) => setRating(v ?? 5)}
+              size="large"
+            />
+          </Box>
+
+          <TextField
+            label="Your review"
+            placeholder="Describe your experience: pros, cons, would you recommend?"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+            fullWidth
+            multiline
+            rows={6}
+          />
+
+          {error && (
+            <FormHelperText error>{error}</FormHelperText>
+          )}
+
+          <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+            <Button type="submit" variant="contained" disabled={submitted}>
+              {submitted ? 'Publishing…' : 'Publish review'}
+            </Button>
+            <Button type="button" variant="outlined" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
+    </Box>
   )
 }
-
-export default WriteReview

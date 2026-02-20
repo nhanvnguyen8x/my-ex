@@ -1,75 +1,101 @@
-import { Link } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardActionArea,
+  CardContent,
+  Link,
+} from '@mui/material'
 import { selectFilteredReviews } from '../store/reviewsSlice'
 import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
 import ReviewCard from '../components/ReviewCard'
-import '../styles/pages/Home.css'
 
-function Home() {
+function CategoryCard({ category }) {
+  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, category.id))
+  return (
+    <Card variant="outlined" sx={{ height: '100%' }}>
+      <CardActionArea component={RouterLink} to={`/category/${category.slug}`} sx={{ height: '100%', p: 3 }}>
+        <CardContent sx={{ textAlign: 'center' }}>
+          <Typography variant="h2" sx={{ mb: 1, fontSize: { xs: '2.5rem', sm: '3rem' } }}>
+            {category.icon}
+          </Typography>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+            {category.name}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: subcategories.length ? 1 : 0 }}>
+            {category.description}
+          </Typography>
+          {subcategories.length > 0 && (
+            <Typography variant="body2" color="text.secondary" display="block">
+              {subcategories.map((s) => s.name).join(', ')}
+            </Typography>
+          )}
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  )
+}
+
+export default function Home() {
   const categories = useSelector((s) => s.categories.list)
   const reviews = useSelector(selectFilteredReviews)
   const recentReviews = reviews.slice(0, 6)
 
   return (
-    <div className="home">
-      <section className="hero">
-        <h1 className="hero-title">Share your experience</h1>
-        <p className="hero-subtitle">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <Box sx={{ textAlign: 'center', py: 2 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ fontStyle: 'italic' }}>
+          Share your experience
+        </Typography>
+        <Typography color="text.secondary" sx={{ maxWidth: 480, mx: 'auto', mb: 2 }}>
           Review cars, laptops, travel, restaurants, and more. Your voice helps others decide.
-        </p>
-        <Link to="/write" className="btn btn-primary">
+        </Typography>
+        <Button component={RouterLink} to="/write" variant="contained" size="large">
           Write a review
-        </Link>
-      </section>
+        </Button>
+      </Box>
 
-      <section className="categories-section">
-        <h2 className="section-title">Browse by category</h2>
-        <div className="categories-grid">
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Browse by category
+        </Typography>
+        <Grid container spacing={3}>
           {categories.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
+            <Grid item xs={12} sm={4} key={cat.id}>
+              <CategoryCard category={cat} />
+            </Grid>
           ))}
-        </div>
-      </section>
+        </Grid>
+      </Box>
 
-      <section className="recent-section">
-        <div className="section-header">
-          <h2 className="section-title">Recent reviews</h2>
-          <Link to="/reviews" className="link-muted">View all</Link>
-        </div>
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 2 }}>
+          <Typography variant="h6">Recent reviews</Typography>
+          <Link component={RouterLink} to="/reviews" color="primary" underline="hover">
+            View all
+          </Link>
+        </Box>
         {recentReviews.length === 0 ? (
-          <div className="empty-state">
-            <p>No reviews yet. Be the first to share your experience.</p>
-            <Link to="/write" className="btn btn-secondary">Write a review</Link>
-          </div>
+          <Card variant="outlined" sx={{ py: 4, textAlign: 'center' }}>
+            <Typography color="text.secondary" sx={{ mb: 2 }}>
+              No reviews yet. Be the first to share your experience.
+            </Typography>
+            <Button component={RouterLink} to="/write" variant="outlined">
+              Write a review
+            </Button>
+          </Card>
         ) : (
-          <div className="reviews-list">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {recentReviews.map((review) => (
-              <ReviewCard key={review.id} review={review} showCategory showSubcategory />
+              <ReviewCard key={review.id} review={review} showCategory showSubcategory showProduct />
             ))}
-          </div>
+          </Box>
         )}
-      </section>
-    </div>
+      </Box>
+    </Box>
   )
 }
-
-function CategoryCard({ category }) {
-  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, category.id))
-  return (
-    <Link
-      to={`/category/${category.slug}`}
-      className="category-card"
-    >
-      <span className="category-icon">{category.icon}</span>
-      <span className="category-name">{category.name}</span>
-      <span className="category-desc">{category.description}</span>
-      {subcategories.length > 0 && (
-        <span className="category-sublist">
-          {subcategories.map((s) => s.name).join(', ')}
-        </span>
-      )}
-    </Link>
-  )
-}
-
-export default Home

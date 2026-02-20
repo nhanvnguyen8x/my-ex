@@ -54,6 +54,69 @@ const subcategoriesByCategory = {
     { id: 'drink-coffee', name: 'Coffee', slug: 'coffee', categoryId: 'drink' },
     { id: 'drink-bubble-tea', name: 'Bubble tea', slug: 'bubble-tea', categoryId: 'drink' },
   ],
+  company: [
+    { id: 'company-us', name: 'United States', slug: 'us', categoryId: 'company' },
+    { id: 'company-vietnam', name: 'Vietnam', slug: 'vietnam', categoryId: 'company' },
+    { id: 'company-japan', name: 'Japan', slug: 'japan', categoryId: 'company' },
+    { id: 'company-uk', name: 'United Kingdom', slug: 'uk', categoryId: 'company' },
+    { id: 'company-germany', name: 'Germany', slug: 'germany', categoryId: 'company' },
+    { id: 'company-singapore', name: 'Singapore', slug: 'singapore', categoryId: 'company' },
+    { id: 'company-korea', name: 'South Korea', slug: 'south-korea', categoryId: 'company' },
+    { id: 'company-india', name: 'India', slug: 'india', categoryId: 'company' },
+    { id: 'company-france', name: 'France', slug: 'france', categoryId: 'company' },
+    { id: 'company-australia', name: 'Australia', slug: 'australia', categoryId: 'company' },
+  ],
+}
+
+const productsBySubcategory = {
+  'cars-toyota': [
+    { id: 'cars-toyota-innova', name: 'Innova', slug: 'innova', subcategoryId: 'cars-toyota' },
+    { id: 'cars-toyota-fortuner', name: 'Fortuner', slug: 'fortuner', subcategoryId: 'cars-toyota' },
+    { id: 'cars-toyota-vios', name: 'Vios', slug: 'vios', subcategoryId: 'cars-toyota' },
+    { id: 'cars-toyota-camry', name: 'Camry', slug: 'camry', subcategoryId: 'cars-toyota' },
+    { id: 'cars-toyota-hilux', name: 'Hilux', slug: 'hilux', subcategoryId: 'cars-toyota' },
+  ],
+  'cars-hyundai': [
+    { id: 'cars-hyundai-tucson', name: 'Tucson', slug: 'tucson', subcategoryId: 'cars-hyundai' },
+    { id: 'cars-hyundai-santa-fe', name: 'Santa Fe', slug: 'santa-fe', subcategoryId: 'cars-hyundai' },
+    { id: 'cars-hyundai-kona', name: 'Kona', slug: 'kona', subcategoryId: 'cars-hyundai' },
+    { id: 'cars-hyundai-elantra', name: 'Elantra', slug: 'elantra', subcategoryId: 'cars-hyundai' },
+  ],
+  'cars-honda': [
+    { id: 'cars-honda-civic', name: 'Civic', slug: 'civic', subcategoryId: 'cars-honda' },
+    { id: 'cars-honda-cr-v', name: 'CR-V', slug: 'cr-v', subcategoryId: 'cars-honda' },
+    { id: 'cars-honda-accord', name: 'Accord', slug: 'accord', subcategoryId: 'cars-honda' },
+  ],
+  'cars-bmw': [
+    { id: 'cars-bmw-3-series', name: '3 Series', slug: '3-series', subcategoryId: 'cars-bmw' },
+    { id: 'cars-bmw-5-series', name: '5 Series', slug: '5-series', subcategoryId: 'cars-bmw' },
+    { id: 'cars-bmw-x5', name: 'X5', slug: 'x5', subcategoryId: 'cars-bmw' },
+  ],
+  'laptops-apple': [
+    { id: 'laptops-apple-macbook-pro', name: 'MacBook Pro', slug: 'macbook-pro', subcategoryId: 'laptops-apple' },
+    { id: 'laptops-apple-macbook-air', name: 'MacBook Air', slug: 'macbook-air', subcategoryId: 'laptops-apple' },
+    { id: 'laptops-apple-macbook', name: 'MacBook', slug: 'macbook', subcategoryId: 'laptops-apple' },
+  ],
+  'laptops-dell': [
+    { id: 'laptops-dell-xps-13', name: 'XPS 13', slug: 'xps-13', subcategoryId: 'laptops-dell' },
+    { id: 'laptops-dell-xps-15', name: 'XPS 15', slug: 'xps-15', subcategoryId: 'laptops-dell' },
+    { id: 'laptops-dell-inspiron', name: 'Inspiron', slug: 'inspiron', subcategoryId: 'laptops-dell' },
+  ],
+  'phones-apple': [
+    { id: 'phones-apple-iphone-15', name: 'iPhone 15', slug: 'iphone-15', subcategoryId: 'phones-apple' },
+    { id: 'phones-apple-iphone-14', name: 'iPhone 14', slug: 'iphone-14', subcategoryId: 'phones-apple' },
+    { id: 'phones-apple-iphone-se', name: 'iPhone SE', slug: 'iphone-se', subcategoryId: 'phones-apple' },
+    { id: 'phones-apple-iphone-pro', name: 'iPhone 15 Pro', slug: 'iphone-15-pro', subcategoryId: 'phones-apple' },
+  ],
+  'phones-samsung': [
+    { id: 'phones-samsung-galaxy-s24', name: 'Galaxy S24', slug: 'galaxy-s24', subcategoryId: 'phones-samsung' },
+    { id: 'phones-samsung-galaxy-a', name: 'Galaxy A series', slug: 'galaxy-a', subcategoryId: 'phones-samsung' },
+    { id: 'phones-samsung-galaxy-z', name: 'Galaxy Z Flip', slug: 'galaxy-z-flip', subcategoryId: 'phones-samsung' },
+  ],
+  'phones-google': [
+    { id: 'phones-google-pixel-8', name: 'Pixel 8', slug: 'pixel-8', subcategoryId: 'phones-google' },
+    { id: 'phones-google-pixel-7', name: 'Pixel 7', slug: 'pixel-7', subcategoryId: 'phones-google' },
+  ],
 }
 
 const initialState = {
@@ -66,8 +129,10 @@ const initialState = {
     { id: 'electronics', name: 'Electronics', slug: 'electronics', icon: '🔌', description: 'Gadgets and electronics' },
     { id: 'food', name: 'Food', slug: 'food', icon: '🍳', description: 'Food experiences and dishes' },
     { id: 'drink', name: 'Drink', slug: 'drink', icon: '🍺', description: 'Beers, coffee, and beverages' },
+    { id: 'company', name: 'Company', slug: 'company', icon: '🏢', description: 'Company reviews by country' },
   ],
   subcategories: Object.values(subcategoriesByCategory).flat(),
+  products: Object.values(productsBySubcategory).flat(),
   selectedCategoryId: null,
 }
 
@@ -88,5 +153,11 @@ export const { setSelectedCategory, clearSelectedCategory } = categoriesSlice.ac
 
 export const selectSubcategoriesByCategoryId = (state, categoryId) =>
   state.categories.subcategories.filter((s) => s.categoryId === categoryId)
+
+export const selectProductsBySubcategoryId = (state, subcategoryId) =>
+  state.categories.products.filter((p) => p.subcategoryId === subcategoryId)
+
+/** Categories that use Country instead of Year (no year field in form/filter). */
+export const CATEGORY_IDS_WITHOUT_YEAR = ['company']
 
 export default categoriesSlice.reducer
