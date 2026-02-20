@@ -54,14 +54,18 @@ export default function WriteReview() {
     setProductId('')
   }
 
+  const user = useSelector((s) => s.auth.user)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!title.trim() || !body.trim()) return
+    // Review-service expects: productId, userId, rating, body (camelCase). Optional: title, categoryId, subcategoryId, year.
     const payload = {
       title: title.trim(),
       categoryId: categoryId || undefined,
       subcategoryId: hasSubcategories && subcategoryId ? subcategoryId : undefined,
       productId: hasProducts && productId ? productId : undefined,
+      userId: user?.id ?? undefined,
       year: showYear && year ? parseInt(year, 10) : undefined,
       rating: rating || undefined,
       body: body.trim(),

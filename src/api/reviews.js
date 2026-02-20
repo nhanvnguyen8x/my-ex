@@ -23,8 +23,8 @@ export async function getReviewById(id) {
 /**
  * Publish (create) a new review.
  * POST /reviews
- * Body: { title, categoryId?, subcategoryId?, productId?, year?, rating?, body }
- * Returns: created Review
+ * Body (camelCase, matches my-ex-review-service): { productId, userId, rating, body?, title?, categoryId?, subcategoryId?, year? }
+ * Returns: created Review (camelCase: id, productId, userId, rating, body, createdAt, updatedAt)
  */
 export async function createReview(payload) {
   const { data } = await apiClient.post('/reviews', payload)
