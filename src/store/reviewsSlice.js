@@ -17,6 +17,7 @@ const saveReviews = (reviews) => {
 const initialState = {
   items: loadReviews(),
   filterCategory: null,
+  filterSubcategoryId: null,
   sortBy: 'newest',
   loading: false,
   error: null,
@@ -83,6 +84,10 @@ const reviewsSlice = createSlice({
     },
     setFilterCategory: (state, action) => {
       state.filterCategory = action.payload
+      state.filterSubcategoryId = null
+    },
+    setFilterSubcategory: (state, action) => {
+      state.filterSubcategoryId = action.payload
     },
     setSortBy: (state, action) => {
       state.sortBy = action.payload
@@ -126,14 +131,17 @@ const reviewsSlice = createSlice({
   },
 })
 
-export const { addReview, deleteReview, setFilterCategory, setSortBy, clearError } =
+export const { addReview, deleteReview, setFilterCategory, setFilterSubcategory, setSortBy, clearError } =
   reviewsSlice.actions
 
 export const selectFilteredReviews = (state) => {
-  const { items, filterCategory, sortBy } = state.reviews
+  const { items, filterCategory, filterSubcategoryId, sortBy } = state.reviews
   let list = filterCategory
     ? items.filter((r) => r.categoryId === filterCategory)
     : [...items]
+  if (filterSubcategoryId) {
+    list = list.filter((r) => r.subcategoryId === filterSubcategoryId)
+  }
 
   const compare = (a, b) => {
     switch (sortBy) {

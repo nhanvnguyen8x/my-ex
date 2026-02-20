@@ -28,6 +28,36 @@
   margin-bottom: 1rem;
 }
 
+.subcategory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.subcategory-pill {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.subcategory-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.subcategory-pill.active {
+  border-color: var(--accent);
+  background: rgba(184, 134, 11, 0.12);
+  color: var(--accent-dim);
+}
+
 .category-page .reviews-list {
   display: flex;
   flex-direction: column;

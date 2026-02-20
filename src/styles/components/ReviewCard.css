@@ -29,6 +29,11 @@
   color: var(--text-muted);
 }
 
+.review-subcategory {
+  color: var(--text-muted);
+  opacity: 0.9;
+}
+
 .review-date {
   font-size: 0.8rem;
   color: var(--text-muted);

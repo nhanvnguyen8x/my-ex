@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { selectFilteredReviews } from '../store/reviewsSlice'
-import { setFilterCategory } from '../store/reviewsSlice'
+import { selectFilteredReviews, setFilterCategory, setFilterSubcategory } from '../store/reviewsSlice'
+import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
 import { useEffect } from 'react'
 import ReviewCard from '../components/ReviewCard'
 import '../styles/pages/Category.css'
@@ -11,11 +11,16 @@ function Category() {
   const dispatch = useDispatch()
   const categories = useSelector((s) => s.categories.list)
   const category = categories.find((c) => c.slug === slug)
+  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, category?.id))
+  const filterSubcategoryId = useSelector((s) => s.reviews.filterSubcategoryId)
   const reviews = useSelector(selectFilteredReviews)
 
   useEffect(() => {
     if (category) dispatch(setFilterCategory(category.id))
-    return () => dispatch(setFilterCategory(null))
+    return () => {
+      dispatch(setFilterCategory(null))
+      dispatch(setFilterSubcategory(null))
+    }
   }, [category, dispatch])
 
   if (!category) {
@@ -38,6 +43,28 @@ function Category() {
         </Link>
       </div>
 
+      {subcategories.length > 0 && (
+        <div className="subcategory-tabs">
+          <button
+            type="button"
+            className={`subcategory-pill ${!filterSubcategoryId ? 'active' : ''}`}
+            onClick={() => dispatch(setFilterSubcategory(null))}
+          >
+            All
+          </button>
+          {subcategories.map((sub) => (
+            <button
+              key={sub.id}
+              type="button"
+              className={`subcategory-pill ${filterSubcategoryId === sub.id ? 'active' : ''}`}
+              onClick={() => dispatch(setFilterSubcategory(sub.id))}
+            >
+              {sub.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {reviews.length === 0 ? (
         <div className="empty-state">
           <p>No reviews in this category yet. Share your experience!</p>
@@ -48,7 +75,7 @@ function Category() {
       ) : (
         <div className="reviews-list">
           {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} showCategory showSubcategory />
           ))}
         </div>
       )}

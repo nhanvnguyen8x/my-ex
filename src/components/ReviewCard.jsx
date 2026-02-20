@@ -1,12 +1,15 @@
-import { useSelector } from 'react-redux'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { deleteReviewAsync } from '../store/reviewsSlice'
 import '../styles/components/ReviewCard.css'
 
-function ReviewCard({ review, showCategory = false }) {
+function ReviewCard({ review, showCategory = false, showSubcategory = false }) {
   const dispatch = useDispatch()
   const categories = useSelector((s) => s.categories.list)
+  const subcategories = useSelector((s) => s.categories.subcategories)
   const category = categories.find((c) => c.id === review.categoryId)
+  const subcategory = review.subcategoryId
+    ? subcategories.find((s) => s.id === review.subcategoryId)
+    : null
 
   const handleDelete = (e) => {
     e.preventDefault()
@@ -32,7 +35,12 @@ function ReviewCard({ review, showCategory = false }) {
       <div className="review-card-header">
         <div className="review-meta">
           {showCategory && category && (
-            <span className="review-category">{category.icon} {category.name}</span>
+            <span className="review-category">
+              {category.icon} {category.name}
+              {showSubcategory && subcategory && (
+                <span className="review-subcategory"> · {subcategory.name}</span>
+              )}
+            </span>
           )}
           <span className="review-date">{date}</span>
         </div>

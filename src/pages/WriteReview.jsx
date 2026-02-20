@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { createReviewAsync } from '../store/reviewsSlice'
+import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
 import '../styles/pages/WriteReview.css'
 
 function WriteReview() {
@@ -15,10 +16,19 @@ function WriteReview() {
 
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState(defaultCategory?.id || categories[0]?.id || '')
+  const [subcategoryId, setSubcategoryId] = useState('')
   const [rating, setRating] = useState(5)
   const [body, setBody] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const error = useSelector((s) => s.reviews.error)
+
+  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, categoryId))
+  const hasSubcategories = subcategories.length > 0
+
+  const handleCategoryChange = (newCategoryId) => {
+    setCategoryId(newCategoryId)
+    setSubcategoryId('')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -26,6 +36,7 @@ function WriteReview() {
     const payload = {
       title: title.trim(),
       categoryId: categoryId || undefined,
+      subcategoryId: hasSubcategories && subcategoryId ? subcategoryId : undefined,
       rating: rating || undefined,
       body: body.trim(),
     }
@@ -35,6 +46,7 @@ function WriteReview() {
       setTitle('')
       setBody('')
       setRating(5)
+      setSubcategoryId('')
       navigate('/reviews')
     }
     setSubmitted(false)
@@ -52,7 +64,7 @@ function WriteReview() {
         <select
           className="form-select"
           value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
+          onChange={(e) => handleCategoryChange(e.target.value)}
         >
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -60,6 +72,26 @@ function WriteReview() {
             </option>
           ))}
         </select>
+
+        {hasSubcategories && (
+          <>
+            <label className="form-label">
+              Subcategory
+            </label>
+            <select
+              className="form-select"
+              value={subcategoryId}
+              onChange={(e) => setSubcategoryId(e.target.value)}
+            >
+              <option value="">Select (optional)</option>
+              {subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
 
         <label className="form-label">
           Title

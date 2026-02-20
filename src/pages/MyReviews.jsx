@@ -1,5 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { selectFilteredReviews, setFilterCategory, setSortBy } from '../store/reviewsSlice'
+import { selectFilteredReviews, setFilterCategory, setFilterSubcategory, setSortBy } from '../store/reviewsSlice'
+import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
 import { Link } from 'react-router-dom'
 import ReviewCard from '../components/ReviewCard'
 import '../styles/pages/MyReviews.css'
@@ -8,8 +9,10 @@ function MyReviews() {
   const dispatch = useDispatch()
   const reviews = useSelector(selectFilteredReviews)
   const filterCategory = useSelector((s) => s.reviews.filterCategory)
+  const filterSubcategoryId = useSelector((s) => s.reviews.filterSubcategoryId)
   const sortBy = useSelector((s) => s.reviews.sortBy)
   const categories = useSelector((s) => s.categories.list)
+  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, filterCategory))
 
   return (
     <div className="my-reviews-page">
@@ -34,6 +37,25 @@ function MyReviews() {
             ))}
           </select>
         </div>
+        {subcategories.length > 0 && (
+          <div className="filter-group">
+            <label className="filter-label">Subcategory</label>
+            <select
+              className="form-select filter-select"
+              value={filterSubcategoryId ?? ''}
+              onChange={(e) =>
+                dispatch(setFilterSubcategory(e.target.value || null))
+              }
+            >
+              <option value="">All</option>
+              {subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="filter-group">
           <label className="filter-label">Sort</label>
           <select
@@ -57,7 +79,7 @@ function MyReviews() {
       ) : (
         <div className="reviews-list">
           {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} showCategory />
+            <ReviewCard key={review.id} review={review} showCategory showSubcategory />
           ))}
         </div>
       )}

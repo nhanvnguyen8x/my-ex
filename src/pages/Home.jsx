@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectFilteredReviews } from '../store/reviewsSlice'
+import { selectSubcategoriesByCategoryId } from '../store/categoriesSlice'
 import ReviewCard from '../components/ReviewCard'
 import '../styles/pages/Home.css'
 
@@ -25,15 +26,7 @@ function Home() {
         <h2 className="section-title">Browse by category</h2>
         <div className="categories-grid">
           {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              to={`/category/${cat.slug}`}
-              className="category-card"
-            >
-              <span className="category-icon">{cat.icon}</span>
-              <span className="category-name">{cat.name}</span>
-              <span className="category-desc">{cat.description}</span>
-            </Link>
+            <CategoryCard key={cat.id} category={cat} />
           ))}
         </div>
       </section>
@@ -51,12 +44,31 @@ function Home() {
         ) : (
           <div className="reviews-list">
             {recentReviews.map((review) => (
-              <ReviewCard key={review.id} review={review} showCategory />
+              <ReviewCard key={review.id} review={review} showCategory showSubcategory />
             ))}
           </div>
         )}
       </section>
     </div>
+  )
+}
+
+function CategoryCard({ category }) {
+  const subcategories = useSelector((s) => selectSubcategoriesByCategoryId(s, category.id))
+  return (
+    <Link
+      to={`/category/${category.slug}`}
+      className="category-card"
+    >
+      <span className="category-icon">{category.icon}</span>
+      <span className="category-name">{category.name}</span>
+      <span className="category-desc">{category.description}</span>
+      {subcategories.length > 0 && (
+        <span className="category-sublist">
+          {subcategories.map((s) => s.name).join(', ')}
+        </span>
+      )}
+    </Link>
   )
 }
 
